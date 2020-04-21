@@ -17,7 +17,9 @@ class Header extends Component {
         <div className='nav-bar'>
           <div className='nav-buttons home-button'>Home</div>
           <div className='nav-button-container'>
-            <div className='nav-buttons'>Register</div>
+            <Link to={'/register'}>
+              <div className='nav-buttons'>Register</div>
+            </Link>
             <div className='nav-buttons'>Login</div>
           </div>
         </div>
