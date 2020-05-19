@@ -66,63 +66,67 @@ class Checkers extends React.Component {
       let updatedPlayerTwoPieces = [...this.state.playerTwoPieces];
       let chosenSquare = this.state.moveableSquares.find(a => a.x == parseInt(e.charAt(0)) && a.y == parseInt(e.charAt(1)));
       let finished = false;
-      
+
       if (chosenSquare.x - this.state.selectedPiece.x <= -2 || chosenSquare.x - this.state.selectedPiece.x >= 2) {
         while (!finished) {
-          let hopSquaresRight = this.state.moveableSquares.filter(a => chosenSquare.x + 2 == a.x && chosenSquare.y - 2 == a.y || chosenSquare.x - 2 == a.x && chosenSquare.y - 2 == a.y);
-          let hopSquaresLeft = this.state.moveableSquares.filter(a => chosenSquare.x + 2 == a.x && chosenSquare.y + 2 == a.y || chosenSquare.x - 2 == a.x && chosenSquare.y + 2 == a.y);
-          if (chosenSquare.x + 2 == this.state.selectedPiece.x || chosenSquare.x - 2 == this.state.selectedPiece.x) {
-            if(chosenSquare.y - 2 == this.state.selectedPiece.y) {
+          // checks if piece exists between moveable square to jump over before adding to right or left hop
+          let hopSquaresRight = this.state.moveableSquares.filter(a => (chosenSquare.x + 2 == a.x && chosenSquare.y - 2 == a.y && updatedPlayerTwoPieces.filter(a => a.x == chosenSquare.x + 1 && a.y == chosenSquare.y - 1).length == 1) || (chosenSquare.x - 2 == a.x && chosenSquare.y - 2 == a.y && updatedPlayerTwoPieces.filter(a => a.x == chosenSquare.x - 1 && a.y == chosenSquare.y - 1).length == 1));
+          let hopSquaresLeft = this.state.moveableSquares.filter(a => (chosenSquare.x + 2 == a.x && chosenSquare.y + 2 == a.y && updatedPlayerTwoPieces.filter(a => a.x == chosenSquare.x + 1 && a.y == chosenSquare.y + 1).length == 1) || (chosenSquare.x - 2 == a.x && chosenSquare.y + 2 == a.y && updatedPlayerTwoPieces.filter(a => a.x == chosenSquare.x - 1 && a.y == chosenSquare.y + 1).length == 1));
+
+          // checks if current square is one jump away from selected piece
+          if (chosenSquare.x + 2 == this.state.selectedPiece.x && chosenSquare.y + 2 == this.state.selectedPiece.y 
+            || chosenSquare.x - 2 == this.state.selectedPiece.x && chosenSquare.y + 2 == this.state.selectedPiece.y 
+            || chosenSquare.x + 2 == this.state.selectedPiece.x && chosenSquare.y - 2 == this.state.selectedPiece.y 
+            || chosenSquare.x - 2 == this.state.selectedPiece.x && chosenSquare.y - 2 == this.state.selectedPiece.y
+            ) {
+            if (chosenSquare.y - 2 == this.state.selectedPiece.y) {
               hopSquaresRight.push(this.state.selectedPiece);
-              console.log('right')
-              console.log(hopSquaresRight)
             } else {
-            hopSquaresLeft.push(this.state.selectedPiece);
-            console.log('left')
-            console.log(hopSquaresLeft);
-            console.log(chosenSquare);
-            console.log(hopSquaresRight);
+              hopSquaresLeft.push(this.state.selectedPiece);
             }
             finished = true;
           }
 
-          // checks hopping left
+          // checks hopping left up
           if (hopSquaresLeft[0] != undefined && chosenSquare.x - hopSquaresLeft[0].x == -2 && chosenSquare.y - hopSquaresLeft[0].y == -2) {
-            console.log('hit 1')
             updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresLeft[0].x - 1 && a.y == hopSquaresLeft[0].y - 1 ? '' : a);
             this.setState({
               playerTwoPieces: updatedPlayerTwoPieces
             });
             chosenSquare = hopSquaresLeft[0];
           }
-          // checks hopping right
+
+          // checks hopping right up
           else if (hopSquaresRight[0] != undefined && chosenSquare.x - hopSquaresRight[0].x == -2 && chosenSquare.y - hopSquaresRight[0].y == 2) {
-            console.log('hit right 1')
             updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresRight[0].x - 1 && a.y == hopSquaresRight[0].y + 1 ? '' : a);
             this.setState({
               playerTwoPieces: updatedPlayerTwoPieces
             });
             chosenSquare = hopSquaresRight[0];
-          } else if (hopSquaresLeft[0] != undefined && chosenSquare.x - hopSquaresLeft[0].x == 2 && chosenSquare.y - hopSquaresLeft[0].y == -2) {
-            console.log('hit 2')
+          }
+
+          // checks hopping left down
+          else if (hopSquaresLeft[0] != undefined && chosenSquare.x - hopSquaresLeft[0].x == 2 && chosenSquare.y - hopSquaresLeft[0].y == -2) {
             updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresLeft[0].x + 1 && a.y == hopSquaresLeft[0].y - 1 ? '' : a);
             this.setState({
               playerTwoPieces: updatedPlayerTwoPieces
             });
             chosenSquare = hopSquaresLeft[0];
           }
-           // checks hopping right
-            else if (hopSquaresRight[0] != undefined && chosenSquare.x - hopSquaresRight[0].x == 2 && chosenSquare.y - hopSquaresRight[0].y == 2) {
-              updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresRight[0].x + 1 && a.y == hopSquaresRight[0].y + 1 ? '' : a);
-              this.setState({
-               playerTwoPieces: updatedPlayerTwoPieces
-             });
+
+          // checks hopping right down
+          else if (hopSquaresRight[0] != undefined && chosenSquare.x - hopSquaresRight[0].x == 2 && chosenSquare.y - hopSquaresRight[0].y == 2) {
+            updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresRight[0].x + 1 && a.y == hopSquaresRight[0].y + 1 ? '' : a);
+            this.setState({
+              playerTwoPieces: updatedPlayerTwoPieces
+            });
             chosenSquare = hopSquaresRight[0];
           }
         }
       }
 
-      updatedPieces = updatedPieces.map(a => a == this.state.selectedPiece && e.charAt(0) != 0 && this.state.selectedPiece.king == false ? a = { king: false, x: parseInt(e.charAt(0)), y: parseInt(e.charAt(1)) } : a == this.state.selectedPiece && e.charAt(0) == 0 ? a = { king: true, x: parseInt(e.charAt(0)), y: parseInt(e.charAt(1)) } : a == this.state.selectedPiece && e.charAt(0) != 0 && this.state.selectedPiece.king == true ? a = { king: true, x: parseInt(e.charAt(0)), y: parseInt(e.charAt(1)) } :a);
+      // updates where player one piece is on board after jump
+      updatedPieces = updatedPieces.map(a => a == this.state.selectedPiece && e.charAt(0) != 0 && this.state.selectedPiece.king == false ? a = { king: false, x: parseInt(e.charAt(0)), y: parseInt(e.charAt(1)) } : a == this.state.selectedPiece && e.charAt(0) == 0 ? a = { king: true, x: parseInt(e.charAt(0)), y: parseInt(e.charAt(1)) } : a == this.state.selectedPiece && e.charAt(0) != 0 && this.state.selectedPiece.king == true ? a = { king: true, x: parseInt(e.charAt(0)), y: parseInt(e.charAt(1)) } : a);
 
       this.setState({
         playerOnePieces: updatedPieces,
@@ -188,25 +192,25 @@ class Checkers extends React.Component {
     let moveableSquares = [];
 
     if (this.state.selected.selected) {
-      // checks if any piece occupies left
-      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX >= 0 && checkYLeft >= 0).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX >= 0 && checkYLeft >= 0).length == 0 && checkYLeft >= 0 && checkX >= 0) {
+      // checks if any piece occupies left up
+      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 0 && checkYLeft >= 0 && checkX >= 0) {
         moveableSquares.push({ x: checkX, y: checkYLeft, firstMove: true })
       }
-      //checks if any piece occupies right
-      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYRight && checkX >= 0 && checkYRight <= 7).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight && checkX >= 0 && checkYRight <= 7).length == 0 && checkYRight <= 7 && checkX >= 0) {
+      //checks if any piece occupies right up
+      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYRight).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight).length == 0 && checkYRight <= 7 && checkX >= 0) {
         moveableSquares.push({ x: checkX, y: checkYRight, firstMove: true })
       }
-      // checks if any enemy piece occupies left
-      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX >= 0 && checkYLeft >= 0).length == 1) {
-        // checks if open square past enemy piece to left
-        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop >= 0 && checkYLeftHop >= 0).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop >= 0 && checkYLeftHop >= 0).length == 0 && checkYLeftHop >= 0 && checkXHop >= 0) {
+      // checks if any enemy piece occupies left up
+      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 1) {
+        // checks if open square past enemy piece to left up
+        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 0 && checkYLeftHop >= 0 && checkXHop >= 0) {
           moveableSquares.push({ x: checkXHop, y: checkYLeftHop, firstMove: false })
         }
       }
-      // checks if any enemy piece occupies right
-      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight && checkX >= 0 && checkYRight <= 7).length == 1) {
-        // checks if open square past enemy piece to right
-        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkX >= 0 && checkYRightHop <= 7).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkXHop >= 0 && checkYRightHop <= 7).length == 0 && checkYRightHop <= 7 && checkXHop >= 0) {
+      // checks if any enemy piece occupies right up
+      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight).length == 1) {
+        // checks if open square past enemy piece to right up
+        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 0 && checkYRightHop <= 7 && checkXHop >= 0) {
           moveableSquares.push({ x: checkXHop, y: checkYRightHop, firstMove: false })
         }
       }
@@ -224,24 +228,27 @@ class Checkers extends React.Component {
             checkYLeftHop = moveableSquares[i].y - 2;
             checkYRightHop = moveableSquares[i].y + 2;
 
-            if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX >= 0 && checkYLeft >= 0).length == 1) {
-              // checks if open square past enemy piece to left
-              if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop >= 0 && checkYLeftHop >= 0).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop >= 0 && checkYLeftHop >= 0).length == 0 && checkXHop >= 0 && checkYLeftHop >= 0) {
+            // checks if any enemy pieces occupies left up
+            if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 1) {
+              // checks if open square past enemy piece to left up
+              if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 0 && checkXHop >= 0 && checkYLeftHop >= 0) {
                 if (moveableSquares.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 1) {
 
                 } else {
+                  moveableSquares = moveableSquares.filter(a => a.firstMove == false)
                   moveableSquares.push({ x: checkXHop, y: checkYLeftHop, firstMove: false });
                   finished = false;
                 }
               }
             }
-            // checks if any enemy piece occupies right
-            if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight && checkX >= 0 && checkYRight <= 7).length == 1) {
-              // checks if open square past enemy piece to right
-              if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkX >= 0 && checkYRightHop <= 7).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkXHop >= 0 && checkYRightHop <= 7).length == 0 && checkXHop >= 0 && checkYRightHop <= 7) {
+            // checks if any enemy piece occupies right up
+            if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight).length == 1) {
+              // checks if open square past enemy piece to right up
+              if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 0 && checkXHop >= 0 && checkYRightHop <= 7) {
                 if (moveableSquares.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 1) {
-                  continue;
+
                 } else {
+                  moveableSquares = moveableSquares.filter(a => a.firstMove == false)
                   moveableSquares.push({ x: checkXHop, y: checkYRightHop, firstMove: false });
                   finished = false;
                 }
@@ -267,27 +274,27 @@ class Checkers extends React.Component {
     let checkYRightHop = this.state.selectedPiece.y + 2;
 
     if (this.state.selected.selected) {
-      // checks if any piece occupies left
-      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX <= 7 && checkYLeft >= 0).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX <= 7 && checkYLeft >= 0).length == 0 && checkX <= 7 && checkYLeft >= 0) {
+      // checks if any piece occupies left down
+      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 0 && checkX <= 7 && checkYLeft >= 0) {
         moveableSquares.push({ x: checkX, y: checkYLeft, firstMove: true })
 
       }
-      //checks if any piece occupies right
-      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYRight && checkX <= 7 && checkYRight <= 7).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight && checkX <= 7 && checkYRight <= 7).length == 0 && checkX <= 7 && checkYRight <= 7) {
+      //checks if any piece occupies right down
+      if (this.state.playerOnePieces.filter(a => a.x == checkX && a.y == checkYRight).length == 0 && this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight).length == 0 && checkX <= 7 && checkYRight <= 7) {
         moveableSquares.push({ x: checkX, y: checkYRight, firstMove: true })
-        
+
       }
-      // checks if any enemy piece occupies left
-      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX <= 7 && checkYLeft >= 0).length == 1) {
-        // checks if open square past enemy piece to left
-        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop <= 7 && checkYLeftHop >= 0).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop <= 7 && checkYLeftHop >= 0).length == 0 && checkXHop <= 7 && checkYLeftHop >= 0) {
+      // checks if any enemy piece occupies left down
+      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft).length == 1) {
+        // checks if open square past enemy piece to left down
+        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop <= 7 && checkYLeftHop >= 0).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 0 && checkXHop <= 7 && checkYLeftHop >= 0) {
           moveableSquares.push({ x: checkXHop, y: checkYLeftHop, firstMove: false });
         }
       }
-      // checks if any enemy piece occupies right
-      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight && checkX <= 7 && checkYRight <= 7).length == 1) {
-        // checks if open square past enemy piece to right
-        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkXHop <= 7 && checkYRightHop <= 7).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkXHop <= 7 && checkYRightHop <= 7).length == 0 && checkXHop <= 7 && checkYRightHop <= 7) {
+      // checks if any enemy piece occupies right down
+      if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight).length == 1) {
+        // checks if open square past enemy piece to right down
+        if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 0 && checkXHop <= 7 && checkYRightHop <= 7) {
           moveableSquares.push({ x: checkXHop, y: checkYRightHop, firstMove: false })
         }
       }
@@ -305,24 +312,27 @@ class Checkers extends React.Component {
             checkYLeftHop = moveableSquares[i].y - 2;
             checkYRightHop = moveableSquares[i].y + 2;
 
+            // checks if any enemy pieces occupies left down
             if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYLeft && checkX >= 0 && checkYLeft >= 0).length == 1) {
-              // checks if open square past enemy piece to left
+              // checks if open square past enemy piece to left down
               if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop >= 0 && checkYLeftHop >= 0).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYLeftHop && checkXHop <= 7 && checkYLeftHop >= 0).length == 0 && checkXHop <= 7 && checkYLeftHop >= 0) {
                 if (moveableSquares.filter(a => a.x == checkXHop && a.y == checkYLeftHop).length == 1) {
 
                 } else {
+                  moveableSquares = moveableSquares.filter(a => a.firstMove == false)
                   moveableSquares.push({ x: checkXHop, y: checkYLeftHop, firstMove: false });
                   finished = false;
                 }
               }
             }
-            // checks if any enemy piece occupies right
+            // checks if any enemy piece occupies right down
             if (this.state.playerTwoPieces.filter(a => a.x == checkX && a.y == checkYRight && checkX >= 0 && checkYRight <= 7).length == 1) {
-              // checks if open square past enemy piece to right
+              // checks if open square past enemy piece to right down
               if (this.state.playerTwoPieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkX >= 0 && checkYRightHop <= 7).length == 0 && this.state.playerOnePieces.filter(a => a.x == checkXHop && a.y == checkYRightHop && checkXHop <= 7 && checkYRightHop <= 7).length == 0 && checkXHop <= 7 && checkYRightHop <= 7) {
                 if (moveableSquares.filter(a => a.x == checkXHop && a.y == checkYRightHop).length == 1) {
-                  continue;
+                  
                 } else {
+                  moveableSquares = moveableSquares.filter(a => a.firstMove == false)
                   moveableSquares.push({ x: checkXHop, y: checkYRightHop, firstMove: false });
                   finished = false;
                 }
