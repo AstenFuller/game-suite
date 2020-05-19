@@ -67,46 +67,56 @@ class Checkers extends React.Component {
       let chosenSquare = this.state.moveableSquares.find(a => a.x == parseInt(e.charAt(0)) && a.y == parseInt(e.charAt(1)));
       let finished = false;
       
-      if (chosenSquare.x - this.state.selectedPiece.x <= -2) {
+      if (chosenSquare.x - this.state.selectedPiece.x <= -2 || chosenSquare.x - this.state.selectedPiece.x >= 2) {
         while (!finished) {
           let hopSquaresRight = this.state.moveableSquares.filter(a => chosenSquare.x + 2 == a.x && chosenSquare.y - 2 == a.y || chosenSquare.x - 2 == a.x && chosenSquare.y - 2 == a.y);
           let hopSquaresLeft = this.state.moveableSquares.filter(a => chosenSquare.x + 2 == a.x && chosenSquare.y + 2 == a.y || chosenSquare.x - 2 == a.x && chosenSquare.y + 2 == a.y);
-          if (chosenSquare.x + 2 == this.state.selectedPiece.x) {
+          if (chosenSquare.x + 2 == this.state.selectedPiece.x || chosenSquare.x - 2 == this.state.selectedPiece.x) {
+            if(chosenSquare.y - 2 == this.state.selectedPiece.y) {
+              hopSquaresRight.push(this.state.selectedPiece);
+              console.log('right')
+              console.log(hopSquaresRight)
+            } else {
             hopSquaresLeft.push(this.state.selectedPiece);
-            hopSquaresRight.push(this.state.selectedPiece);
+            console.log('left')
+            console.log(hopSquaresLeft);
+            console.log(chosenSquare);
+            console.log(hopSquaresRight);
+            }
             finished = true;
           }
 
           // checks hopping left
           if (hopSquaresLeft[0] != undefined && chosenSquare.x - hopSquaresLeft[0].x == -2 && chosenSquare.y - hopSquaresLeft[0].y == -2) {
+            console.log('hit 1')
             updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresLeft[0].x - 1 && a.y == hopSquaresLeft[0].y - 1 ? '' : a);
             this.setState({
               playerTwoPieces: updatedPlayerTwoPieces
             });
             chosenSquare = hopSquaresLeft[0];
           }
-
           // checks hopping right
           else if (hopSquaresRight[0] != undefined && chosenSquare.x - hopSquaresRight[0].x == -2 && chosenSquare.y - hopSquaresRight[0].y == 2) {
+            console.log('hit right 1')
             updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresRight[0].x - 1 && a.y == hopSquaresRight[0].y + 1 ? '' : a);
             this.setState({
               playerTwoPieces: updatedPlayerTwoPieces
             });
             chosenSquare = hopSquaresRight[0];
           } else if (hopSquaresLeft[0] != undefined && chosenSquare.x - hopSquaresLeft[0].x == 2 && chosenSquare.y - hopSquaresLeft[0].y == -2) {
+            console.log('hit 2')
             updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresLeft[0].x + 1 && a.y == hopSquaresLeft[0].y - 1 ? '' : a);
             this.setState({
               playerTwoPieces: updatedPlayerTwoPieces
             });
             chosenSquare = hopSquaresLeft[0];
           }
-
-          // checks hopping right
-          else if (hopSquaresRight[0] != undefined && chosenSquare.x - hopSquaresRight[0].x == 2 && chosenSquare.y - hopSquaresRight[0].y == 2) {
-            updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresRight[0].x + 1 && a.y == hopSquaresRight[0].y + 1 ? '' : a);
-            this.setState({
-              playerTwoPieces: updatedPlayerTwoPieces
-            });
+           // checks hopping right
+            else if (hopSquaresRight[0] != undefined && chosenSquare.x - hopSquaresRight[0].x == 2 && chosenSquare.y - hopSquaresRight[0].y == 2) {
+              updatedPlayerTwoPieces = updatedPlayerTwoPieces.map(a => a.x == hopSquaresRight[0].x + 1 && a.y == hopSquaresRight[0].y + 1 ? '' : a);
+              this.setState({
+               playerTwoPieces: updatedPlayerTwoPieces
+             });
             chosenSquare = hopSquaresRight[0];
           }
         }
